@@ -1,6 +1,5 @@
 import React from "react";
 import { OrderItem, OrderStatus } from "resources/order";
-import { PaymentMethod, PaymentStatus } from "resources/payment";
 import { loadProducts, Product } from "resources/product";
 import { v4 } from "uuid";
 import { TransactionContext } from "components/transaction/TransactionContext";
@@ -48,14 +47,6 @@ const randomOrder = (
     id: 0,
     total,
     address: {},
-    payment: {
-      id: 1,
-      url: "",
-      amount: 570000,
-      method: PaymentMethod.COD,
-      status: PaymentStatus.PENDING,
-      message: "",
-    },
     discount: 0,
     status: OrderStatus.DRAFT,
     shipping_fee: 0,

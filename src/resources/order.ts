@@ -1,5 +1,4 @@
 import api from "./api";
-import { Payment } from "./payment";
 import { Address } from "./address";
 import { Product } from "./product";
 import { User } from "./user";
@@ -35,7 +34,6 @@ export interface Order {
   id: number;
   total: number;
   address: Address;
-  payment: Payment;
   discount: number;
   status: OrderStatus;
   voucher?: string;

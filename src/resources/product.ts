@@ -64,7 +64,7 @@ export async function loadProduct(slug: string) {
 }
 
 export async function loadProducts() {
-  // await new Promise(resolve => setTimeout(resolve, 5000));-
+  // await new Promise(resolve => setTimeout(resolve, 5000));
   return api.get<Product[]>("/product/all");
 }
 

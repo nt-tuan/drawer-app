@@ -51,7 +51,7 @@ const TransactionContextConsumer = () => {
 
   return (
     <Flex h="100%" overflow="hidden">
-      <Box w={72} h="100%">
+      <Box w={80} h="100%">
         <Box
           textAlign="center"
           fontSize="2xl"

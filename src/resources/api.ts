@@ -4,9 +4,8 @@ async function request<T>(
   _headers?: HeadersInit,
   body?: string
 ): Promise<T> {
-  const url = process.env.NEXT_PUBLIC_API_URL + path;
   const headers = { ..._headers, "Content-Type": "application/json" };
-  const response = await fetch(url, { method, headers, body });
+  const response = await fetch(path, { method, headers, body });
   if (response.ok) return response.json();
   const { error } = await response.json();
   throw Error(error);

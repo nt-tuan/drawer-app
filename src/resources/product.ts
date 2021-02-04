@@ -1,7 +1,4 @@
 import api from "./api";
-import ptmAPI from "./ptm";
-import { Category } from "./category";
-import ptm from "./ptm";
 
 export enum Grind {
   BEAN = "bean",
@@ -43,7 +40,6 @@ export interface Product {
   features: ProductFeature[];
   children: Product[];
   options: number[];
-  category: Category;
   badges: ProductBadge[];
 }
 
@@ -59,25 +55,7 @@ export interface ProductCollection {
   products: Product[];
 }
 
-export async function loadProduct(slug: string) {
-  return api.get<Product>(`/product?slug=${slug}`);
-}
-
 export async function loadProducts() {
   // await new Promise(resolve => setTimeout(resolve, 5000));
-  return api.get<Product[]>("/product/all");
-}
-
-export async function loadCollections() {
-  return api.get<ProductCollection[]>("/product/collection/all");
-}
-
-export async function loadCollectionsByIds(ids: number[]) {
-  return api.get<ProductCollection[]>(
-    `/product/collection?ids=${ids.join(",")}`
-  );
-}
-
-export async function createPreviewProduct(product: Product) {
-  return ptmAPI.post("/product", "", JSON.stringify(product));
+  return api.get<Product[]>("/api/products");
 }

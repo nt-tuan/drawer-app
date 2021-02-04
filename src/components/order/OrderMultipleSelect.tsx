@@ -33,7 +33,7 @@ export const OrderCard = ({
           p={1}
           bgColor={active ? "blue.100" : "gray.100"}
         >
-          <Box>
+          <Box w="50%" isTruncated>
             <Text as="span" mr={1} fontSize="base" fontWeight="bold">
               {order.user.name}
             </Text>
@@ -42,7 +42,14 @@ export const OrderCard = ({
               {order.user.phone}
             </Text>
           </Box>
-          <Box as="span" fontSize="xl" fontWeight="bold">
+          <Box
+            textAlign="right"
+            isTruncated
+            w="50%"
+            as="span"
+            fontSize="xl"
+            fontWeight="bold"
+          >
             {numeral(order.total).format("0,0 $")}
           </Box>
         </Flex>

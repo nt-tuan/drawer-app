@@ -47,7 +47,7 @@ export const OrderCard = ({
             isTruncated
             w="50%"
             as="span"
-            fontSize="xl"
+            fontSize="lg"
             fontWeight="bold"
           >
             {numeral(order.total).format("0,0 $")}

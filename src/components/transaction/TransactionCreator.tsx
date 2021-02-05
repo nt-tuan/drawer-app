@@ -89,7 +89,7 @@ const TransactionContextConsumer = () => {
           textColor="blue.700"
           mb={2}
         >
-          Đơn hàng
+          Đơn hàng {orders.length > 0 ? `(${orders.length})` : ""}
         </Box>
         <OrderMultipleSelect
           orders={orders}

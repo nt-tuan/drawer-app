@@ -1,12 +1,14 @@
 import React from "react";
 import { DrawerTransaction } from "components/asset/DrawerTransaction";
-import { Order, OrderStatus } from "resources/order";
+import { Order } from "resources/order";
 import { useOrderGenerator } from "components/order/useOrderGenerator";
 import { OrderMultipleSelect } from "components/order/OrderMultipleSelect";
 import { TransactionContext } from "components/transaction/TransactionContext";
 import { DrawerReset } from "components/drawer/DrawerSetter";
-import { Box, Center, Flex } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, useToast } from "@chakra-ui/react";
 import { TransactionProvider } from "./TransactionProvider";
+import { getTotalBalance } from "resources/transaction/transaction";
+import { useRouter } from "next/dist/client/router";
 
 const TransactionContextConsumer = () => {
   useOrderGenerator({
@@ -15,6 +17,9 @@ const TransactionContextConsumer = () => {
     itemCountRange: [1, 4],
     quantityRange: [1, 10],
   });
+  const toast = useToast();
+  const router = useRouter();
+  const toastIdRef = React.useRef<any>();
   const { orders, drawer } = React.useContext(TransactionContext);
   const [selectedOrders, setSelectedOrders] = React.useState<Order[]>([]);
   const handleSelectOrder = React.useCallback(
@@ -41,13 +46,38 @@ const TransactionContextConsumer = () => {
         (selectedOrder) =>
           orders.filter(
             (order) =>
-              order.status === OrderStatus.DRAFT &&
+              order.status === "draft" &&
               order.localId === selectedOrder.localId
           ).length > 0
       );
       return filtered;
     });
   }, [orders]);
+  React.useEffect(() => {
+    if (drawer != null && getTotalBalance(drawer) > 0) {
+      if (toastIdRef.current) {
+        toast.close(toastIdRef.current);
+      }
+      return;
+    }
+    toastIdRef.current = toast({
+      title: "Tủ tiền của bạn đang trống",
+      description: (
+        <Box>
+          <Box>
+            Tủ tiền của bạn đang trống nên bạn sẽ không thể trả tiền thừa cho
+            khách!
+          </Box>
+          <Button textColor="orange.500" onClick={() => router.push("/drawer")}>
+            Thiết lập tủ tiền
+          </Button>
+        </Box>
+      ),
+      isClosable: true,
+      status: "warning",
+      duration: null,
+    });
+  }, [drawer, toast, router]);
 
   return (
     <Flex h="100%" overflow="hidden">

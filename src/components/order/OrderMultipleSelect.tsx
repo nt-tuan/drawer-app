@@ -1,5 +1,5 @@
 import React from "react";
-import { Order, OrderStatus } from "resources/order";
+import { Order } from "resources/order";
 import numeral from "numeral";
 import { Box, Flex, VStack, Text } from "@chakra-ui/react";
 interface Props {
@@ -17,7 +17,7 @@ export const OrderCard = ({
   onClick: (order: Order) => void;
 }) => {
   return (
-    <Box p={2} cursor="pointer">
+    <Box p={1} cursor="pointer">
       <Flex
         direction="column"
         textColor="gray.700"
@@ -101,7 +101,7 @@ export const OrderMultipleSelect = (props: Props) => {
       )}
       <VStack h={0} flex={1} alignItems="stretch" overflow="auto">
         {props.orders
-          .filter((order) => order.status === OrderStatus.DRAFT)
+          .filter((order) => order.status === "draft")
           .map((order) => (
             <OrderCard
               order={order}

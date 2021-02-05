@@ -1,5 +1,5 @@
 import React from "react";
-import { OrderItem, OrderStatus } from "resources/order";
+import { OrderItem } from "resources/order";
 import { loadProducts, Product } from "resources/product";
 import { v4 } from "uuid";
 import { TransactionContext } from "components/transaction/TransactionContext";
@@ -48,7 +48,7 @@ const randomOrder = (
     total,
     address: {},
     discount: 0,
-    status: OrderStatus.DRAFT,
+    status: "draft",
     shipping_fee: 0,
     items,
     user: {

@@ -7,6 +7,7 @@ export interface TransactionSet {
 export interface OrderSet {
   [key: string]: Order;
 }
+
 export interface TransactionContextState {
   drawer?: Drawer;
   setDrawer: React.Dispatch<React.SetStateAction<Drawer | undefined>>;
@@ -21,22 +22,22 @@ export interface TransactionContextState {
   setDraftTransactions: React.Dispatch<React.SetStateAction<TransactionSet>>;
   onOrderSelected: (_: Order) => void;
   onOrderDeselected: (_: Order) => void;
-  onOrderLent: (_: Transaction) => void;
-  onOrderShiped: (_: Transaction) => void;
-  onOrderPaid: (_: Transaction) => void;
+  onAddTransaction: (_: Transaction) => void;
+  onTransactionDelete: (_: Transaction) => void;
+  onTransactionEdit: (_: Transaction) => void;
 }
-
+const fooFunc = () => {};
 export const TransactionContext = createContext<TransactionContextState>({
   orders: [],
-  setDrawer: () => {},
-  setOrders: () => {},
+  setDrawer: fooFunc,
+  setOrders: fooFunc,
   transactions: {},
   draftTransactions: {},
-  setTransactions: () => {},
-  setDraftTransactions: () => {},
-  onOrderSelected: () => {},
-  onOrderDeselected: () => {},
-  onOrderLent: () => {},
-  onOrderShiped: () => {},
-  onOrderPaid: () => {},
+  setTransactions: fooFunc,
+  setDraftTransactions: fooFunc,
+  onOrderSelected: fooFunc,
+  onOrderDeselected: fooFunc,
+  onAddTransaction: fooFunc,
+  onTransactionDelete: fooFunc,
+  onTransactionEdit: fooFunc,
 });

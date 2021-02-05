@@ -3,92 +3,134 @@ import React from "react";
 import numeral from "numeral";
 import {
   getTotalBalance,
-  multipleAsset,
   newAsset,
   Transaction,
   TransactionStatus,
+  TransactionType,
 } from "resources/transaction/transaction";
 import { AssetView } from "components/asset/AssetView";
 import {
   Box,
-  Center,
   Flex,
   HStack,
-  Tag,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Badge,
+  IconButton,
 } from "@chakra-ui/react";
-import { TriangleUpIcon, TriangleDownIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { TransactionContext } from "./TransactionContext";
 
 interface Props {
   transaction: Transaction;
 }
-export const TransactionCard = (props: Props) => {
-  const { negativeAsset, negativeTotal } = React.useMemo(() => {
-    const negativeAsset = multipleAsset(props.transaction, -1);
-    const negativeTotal = getTotalBalance(
-      props.transaction,
-      (_, value) => value < 0
+const TransactionStatusTag = ({ status }: { status: TransactionStatus }) => {
+  if (status === "pending")
+    return (
+      <Badge alignSelf="center" colorScheme="blue">
+        pending
+      </Badge>
     );
-    return { negativeAsset, negativeTotal };
-  }, [props]);
+  if (status === "draft")
+    return (
+      <Badge alignSelf="center" colorScheme="gray">
+        draft
+      </Badge>
+    );
+  if (status === "committed")
+    return (
+      <Badge alignSelf="center" colorScheme="green">
+        committed
+      </Badge>
+    );
+  return <></>;
+};
+const TransactionTypeTag = ({ type }: { type: TransactionType }) => {
+  if (type === "lending")
+    return (
+      <Box textColor="gray.700" fontWeight="bold">
+        Lend
+      </Box>
+    );
+  if (type === "order")
+    return (
+      <Box textColor="gray.700" fontWeight="bold">
+        Cash
+      </Box>
+    );
+  if (type === "reset")
+    return (
+      <Box textColor="gray.700" fontWeight="bold">
+        Reset
+      </Box>
+    );
+  if (type === "shipping")
+    return (
+      <Box textColor="gray.700" fontWeight="bold">
+        Ship
+      </Box>
+    );
+  return <></>;
+};
+export const TransactionCard = (props: Props) => {
+  const { onTransactionDelete } = React.useContext(TransactionContext);
   return (
-    <AccordionItem>
-      <AccordionButton bgColor="gray.100">
-        <Box flex="1" textAlign="left">
-          <Flex p={2} w="100%" justify="space-between">
-            <HStack>
-              <Box overflow="hidden" text="base" textColor="gray.500">
-                {props.transaction.id}
+    <Box>
+      <AccordionItem>
+        <AccordionButton bgColor="gray.100" py={0}>
+          <Box flex="1" textAlign="left">
+            <Flex px={2} w="100%" justify="space-between" alignItems="baseline">
+              <HStack spacing={4} alignItems="baseline" justify="stretch">
+                <TransactionTypeTag type={props.transaction.type} />
+                <Box overflow="hidden" fontSize="xs" textColor="gray.500">
+                  {new Date(props.transaction.createdAt).toLocaleString("vi")}
+                </Box>
+                <TransactionStatusTag status={props.transaction.status} />
+              </HStack>
+              <Box
+                fontSize="lg"
+                fontWeight="bold"
+                textAlign="right"
+                textColor="gray.700"
+                as="span"
+              >
+                {numeral(getTotalBalance(props.transaction)).format("0,0 $")}
               </Box>
-              {props.transaction.status === TransactionStatus.PENDING && (
-                <Tag colorScheme="blue">pending</Tag>
-              )}
+            </Flex>
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+        <AccordionPanel pb={4}>
+          <Box p={1}>
+            <HStack spacing={2} pb={4} justify="flex-end">
+              <IconButton
+                icon={<DeleteIcon />}
+                aria-label="delete"
+                onClick={() => onTransactionDelete(props.transaction)}
+              />
             </HStack>
-            <Box
-              fontSize="lg"
-              fontWeight="bold"
-              textAlign="right"
-              textColor="gray.700"
-              as="span"
-            >
-              {numeral(getTotalBalance(props.transaction)).format("0,0 $")}
-            </Box>
-          </Flex>
-        </Box>
-        <AccordionIcon />
-      </AccordionButton>
-      <AccordionPanel pb={4}>
-        <Box p={1} rounded="base" shadow="base">
-          <Flex p={1} wrap="wrap" alignItems="stretch">
-            <Center>
-              <TriangleUpIcon boxSize="24px" color="green" />
-            </Center>
-            <AssetView current={props.transaction} asset={newAsset()} />
-          </Flex>
-          {negativeTotal !== 0 && (
-            <Flex p={1} wrap="wrap" alignItems="stretch">
-              <Center>
-                <TriangleDownIcon boxSize="24px" color="red" />
-              </Center>
-              <AssetView current={negativeAsset} asset={newAsset()} />
-            </Flex>
-          )}
-          {(props.transaction.orders?.length ?? 0) > 0 && (
-            <Flex p={1} wrap="wrap" alignItems="stretch">
-              <Center>
-                <TriangleDownIcon boxSize="24px" color="red" />
-              </Center>
-              {props.transaction.orders &&
-                props.transaction.orders.map((order, index) => (
-                  <OrderCard key={index} onClick={() => {}} order={order} />
-                ))}
-            </Flex>
-          )}
-        </Box>
-      </AccordionPanel>
-    </AccordionItem>
+
+            <AssetView
+              stackThreshold={1}
+              negativeColorScheme="red"
+              positiveColorScheme="green"
+              current={props.transaction}
+              asset={newAsset()}
+            />
+
+            {props.transaction.orders != null &&
+              props.transaction.orders.length > 0 && (
+                <Flex p={1} wrap="wrap" alignItems="stretch">
+                  {props.transaction.orders.map((order, index) => (
+                    <OrderCard key={index} onClick={() => {}} order={order} />
+                  ))}
+                </Flex>
+              )}
+          </Box>
+        </AccordionPanel>
+      </AccordionItem>
+    </Box>
   );
 };

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Cash,
-  Drawer,
-  newAsset,
-  Transaction,
-  TransactionStatus,
-  TransactionType,
-} from "resources/transaction/transaction";
+import { Cash, Drawer, newAsset } from "resources/transaction/transaction";
 import { AssetPicker } from "../asset/AssetPicker";
 import { TransactionContext } from "components/transaction/TransactionContext";
 import { Box, Button, Center, Flex, Heading } from "@chakra-ui/react";
@@ -14,7 +7,7 @@ import { v4 } from "uuid";
 
 export const DrawerReset = () => {
   const [drawer, setDrawer] = React.useState<Drawer>(newAsset());
-  const { setTransactions } = React.useContext(TransactionContext);
+  const { onAddTransaction } = React.useContext(TransactionContext);
   const renderAssetTypeExtra = (cash: Cash) => (
     <Flex justify="space-between">
       <Box
@@ -39,16 +32,14 @@ export const DrawerReset = () => {
     [drawer]
   );
   const handleConfirm = React.useCallback(() => {
-    const uuid = v4();
-    const resetTs: Transaction = {
+    onAddTransaction({
       ...drawer,
-      type: TransactionType.RESET,
-      status: TransactionStatus.PENDING,
-      id: uuid,
+      type: "reset",
+      status: "pending",
+      id: v4(),
       createdAt: new Date(),
-    };
-    setTransactions((tsx) => (tsx ? { ...tsx, [uuid]: resetTs } : tsx));
-  }, [drawer, setTransactions]);
+    });
+  }, [drawer, onAddTransaction]);
   return (
     <Flex direction="column" alignItems="center" h="100%" textColor="gray.500">
       <Heading mb={8}>Thiết lập tủ tiền</Heading>

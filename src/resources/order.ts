@@ -1,10 +1,6 @@
 import { Product } from "./product";
 import { User } from "./user";
-export enum OrderStatus {
-  DRAFT = "draft",
-  PENDING = "pending",
-  PLACED = "placed",
-}
+export type OrderStatus = "draft" | "pending" | "placed";
 
 export interface OrderItem {
   id: number;

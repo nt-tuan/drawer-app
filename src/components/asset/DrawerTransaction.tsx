@@ -9,8 +9,6 @@ import {
   addAsset,
   multipleAsset,
   Transaction,
-  TransactionStatus,
-  TransactionType,
 } from "resources/transaction/transaction";
 import { AssetPicker } from "./AssetPicker";
 import { AssetView } from "./AssetView";
@@ -18,13 +16,10 @@ import { suggestAsset } from "common/suggestAsset";
 import { PriorityQueue } from "common/PriorityQueue";
 import { WithdrawSuggestion } from "./WithdrawSuggestion";
 import numeral from "numeral";
-import { Order, OrderStatus } from "resources/order";
-import {
-  TransactionContext,
-  TransactionSet,
-} from "components/transaction/TransactionContext";
+import { Order } from "resources/order";
+import { TransactionContext } from "components/transaction/TransactionContext";
 import { v4 } from "uuid";
-import { Box, Button, Flex, HStack } from "@chakra-ui/react";
+import { Box, Button, Flex, VStack } from "@chakra-ui/react";
 
 interface Props {
   orders: Order[];
@@ -40,6 +35,8 @@ interface ViewProps {
   onDown: (cash: Cash) => void;
   onReset: () => void;
   onConfirm: () => void;
+  onShip: () => void;
+  onLend: () => void;
 }
 
 const AssetTotalValue = ({
@@ -68,11 +65,7 @@ const DrawerTransactionView = ({
   total,
   asset,
   suggestions,
-  onApplySuggestion,
-  onUp,
-  onDown,
-  onReset,
-  onConfirm,
+  ...props
 }: ViewProps) => {
   const getAsset = React.useCallback(
     (filter: (cash: Cash, count: number) => boolean) => {
@@ -132,8 +125,8 @@ const DrawerTransactionView = ({
         <AssetPicker
           getIntent={getIntent}
           asset={asset}
-          onUp={onUp}
-          onDown={onDown}
+          onUp={props.onUp}
+          onDown={props.onDown}
           renderAssetTypeExtra={renderAssetTypeExtra}
         />
       </Box>
@@ -155,10 +148,17 @@ const DrawerTransactionView = ({
             alignItems="justify"
             overflow="hidden"
           >
-            <Box px={1} bgColor="gray.100">
+            <Box px={2} mb={4} bgColor="gray.100">
               <AssetTotalValue label="Trả" asset={withdrawal} />
             </Box>
-            <Box h={0} flex={1} px={1} overflowY="auto" pb={10}>
+            <VStack
+              h={0}
+              flex={1}
+              overflowY="auto"
+              pb={10}
+              px={2}
+              alignItems="stretch"
+            >
               {suggestions.length === 0 && (
                 <WithdrawSuggestion
                   asset={newAsset()}
@@ -172,10 +172,10 @@ const DrawerTransactionView = ({
                   withdrawal={withdrawal}
                   total={getTotalBalance(deposit) - total}
                   asset={asset}
-                  onClick={onApplySuggestion}
+                  onClick={props.onApplySuggestion}
                 />
               ))}
-            </Box>
+            </VStack>
           </Flex>
         </Box>
         <Box px={1} pl={2} w={72}>
@@ -186,20 +186,18 @@ const DrawerTransactionView = ({
             shadow="base"
             overflowY="hidden"
           >
-            <Box px={1} bgColor="gray.100">
+            <Box px={2} bgColor="gray.100" mb={4}>
               <AssetTotalValue label="Nhận" asset={deposit} />
             </Box>
-            <Flex
-              h={0}
-              flex={1}
-              wrap="wrap"
-              alignContent="flex-start"
-              px={1}
-              pb={10}
-              overflowY="auto"
-            >
-              <AssetView current={deposit} asset={newAsset()} />
-            </Flex>
+            <Box px={2}>
+              <AssetView
+                stackThreshold={4}
+                positiveColorScheme="green"
+                negativeColorScheme="red"
+                current={deposit}
+                asset={newAsset()}
+              />
+            </Box>
           </Flex>
         </Box>
       </Flex>
@@ -219,17 +217,27 @@ const DrawerTransactionView = ({
       </Flex>
       <Flex alignItems="stretch">
         <Box w={0} flex={1}>
-          <Button w="100%" onClick={onReset}>
-            Cancel
+          <Button w="100%" onClick={props.onReset}>
+            Hủy
+          </Button>
+        </Box>
+        <Box pl={1}>
+          <Button w="100%" onClick={props.onLend}>
+            Ghi nợ
+          </Button>
+        </Box>
+        <Box pl={1}>
+          <Button w="100%" onClick={props.onShip}>
+            Ship/Thu hộ
           </Button>
         </Box>
         <Box pl={1} w={72}>
           <Button
             w="100%"
-            onClick={onConfirm}
+            onClick={props.onConfirm}
             colorScheme={balance === total ? "green" : undefined}
           >
-            Confirm
+            Xác nhận
           </Button>
         </Box>
       </Flex>
@@ -247,9 +255,7 @@ export const DrawerTransaction = ({ orders: selectedOrder }: Props) => {
     draftTransactions,
     setDraftTransactions,
     drawer,
-    setTransactions,
-    orders,
-    setOrders,
+    onAddTransaction,
   } = React.useContext(TransactionContext);
   const asset: Asset = React.useMemo(() => editingTransaction ?? newAsset(), [
     editingTransaction,
@@ -272,8 +278,8 @@ export const DrawerTransaction = ({ orders: selectedOrder }: Props) => {
       if (editingTransaction == null) {
         const transaction: Transaction = {
           orders: [...selectedOrder],
-          status: TransactionStatus.DRAFT,
-          type: TransactionType.ORDER,
+          status: "draft",
+          type: "order",
           id: v4(),
           ...asset,
           createdAt: new Date(),
@@ -354,62 +360,42 @@ export const DrawerTransaction = ({ orders: selectedOrder }: Props) => {
   }, [updateAsset]);
   const handleConfirm = React.useCallback(() => {
     if (editingTransaction == null) return;
-    const newTx = {
+    const newTx: Transaction = {
       ...editingTransaction,
       createdAt: new Date(),
-      status: TransactionStatus.PENDING,
+      status: "pending",
     };
-    const newTxs = Object.values(draftTransactions).reduce(
-      (set: TransactionSet, tx) => {
-        if (editingTransaction.id === tx.id) return set;
-        if (editingTransaction.orders == null)
-          return {
-            ...set,
-            [tx.id]: tx,
-          };
-        const hasEditingOrders =
-          editingTransaction.orders.filter(
-            (editingOrder) =>
-              tx.orders &&
-              tx.orders.filter(
-                (order) => order.localId === editingOrder.localId
-              ).length > 0
-          ).length > 0;
-        if (hasEditingOrders) {
-          return set;
-        }
-        return { ...set, [tx.id]: tx };
-      },
-      {}
-    );
-    setDraftTransactions(newTxs);
-    setTransactions((txs) => ({ ...txs, [newTx.id]: newTx }));
-    const newOrders = orders?.map((order) => {
-      if (editingTransaction.orders == null) {
-        return order;
-      }
-      const has =
-        editingTransaction.orders.filter(
-          (editingOrder) => editingOrder.localId === order.localId
-        ).length > 0;
-      if (has) return { ...order, status: OrderStatus.PENDING };
-      return order;
-    });
-    setOrders(newOrders);
-  }, [
-    editingTransaction,
-    setTransactions,
-    draftTransactions,
-    setDraftTransactions,
-    orders,
-    setOrders,
-  ]);
-
+    onAddTransaction(newTx);
+  }, [editingTransaction, onAddTransaction]);
+  const handleLend = React.useCallback(() => {
+    if (selectedOrder == null || selectedOrder.length === 0) return;
+    const newTx: Transaction = {
+      orders: selectedOrder,
+      createdAt: new Date(),
+      status: "pending",
+      type: "lending",
+      id: v4(),
+      ...newAsset(),
+    };
+    onAddTransaction(newTx);
+  }, [onAddTransaction, selectedOrder]);
+  const handleShip = React.useCallback(() => {
+    if (selectedOrder == null || selectedOrder.length === 0) return;
+    const newTx: Transaction = {
+      orders: selectedOrder,
+      createdAt: new Date(),
+      status: "pending",
+      type: "shipping",
+      id: v4(),
+      ...newAsset(),
+    };
+    onAddTransaction(newTx);
+  }, [onAddTransaction, selectedOrder]);
   React.useEffect(() => {
     const existTx = Object.values(draftTransactions).filter((tx) => {
       if (
         tx.orders == null ||
-        tx.status !== TransactionStatus.DRAFT ||
+        tx.status !== "draft" ||
         selectedOrder.length === 0
       )
         return false;
@@ -437,6 +423,8 @@ export const DrawerTransaction = ({ orders: selectedOrder }: Props) => {
         asset={asset}
         onReset={handleReset}
         onConfirm={handleConfirm}
+        onLend={handleLend}
+        onShip={handleShip}
       />
     </>
   );

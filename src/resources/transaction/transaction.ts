@@ -64,15 +64,8 @@ export function addAsset(a: Asset, b: Asset) {
   }, newAsset());
 }
 
-export enum TransactionStatus {
-  PENDING = "pending",
-  DRAFT = "draft",
-  COMMITED = "committed",
-}
-export enum TransactionType {
-  ORDER = "order",
-  RESET = "reset",
-}
+export type TransactionStatus = "pending" | "draft" | "committed";
+export type TransactionType = "order" | "shipping" | "lending" | "reset";
 // Transaction.ts
 export interface Transaction extends Asset {
   status: TransactionStatus;

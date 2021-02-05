@@ -12,7 +12,7 @@ interface Props {
 const WithdrawSuggestionContent = ({ asset, withdrawal, total }: Props) => {
   const requestMoreAmount = getTotalBalance(asset) - total;
   return (
-    <Box w="100%">
+    <Box w="100%" py={1}>
       {requestMoreAmount > 0 && (
         <Box px={2} textColor="yellow.700" bgColor="yellow.100">
           Mình hỏi khách có{" "}
@@ -22,31 +22,34 @@ const WithdrawSuggestionContent = ({ asset, withdrawal, total }: Props) => {
           không
         </Box>
       )}
-      <Flex wrap="wrap">
-        <AssetView asset={asset} current={withdrawal} />
-      </Flex>
+      <AssetView
+        stackThreshold={4}
+        negativeColorScheme="green"
+        positiveColorScheme="red"
+        asset={asset}
+        current={withdrawal}
+      />
     </Box>
   );
 };
 
 export const WithdrawSuggestion = (props: Props) => {
   return (
-    <Box py={1}>
-      <Box
-        rounded="lg"
-        shadow="base"
-        bgColor="white"
-        border="1px"
-        borderColor="gray.300"
-        overflow="hidden"
-        cursor={props.onClick ? "pointer" : undefined}
-        _hover={{
-          bgColor: props.onClick ? "gray.50" : undefined,
-        }}
-        onClick={() => props.onClick && props.onClick(props.asset, 0)}
-      >
-        <WithdrawSuggestionContent {...props} />
-      </Box>
+    <Box
+      px={2}
+      py={2}
+      rounded="lg"
+      shadow="base"
+      bgColor="white"
+      border="1px"
+      borderColor="gray.300"
+      cursor={props.onClick ? "pointer" : undefined}
+      _hover={{
+        bgColor: props.onClick ? "gray.50" : undefined,
+      }}
+      onClick={() => props.onClick && props.onClick(props.asset, 0)}
+    >
+      <WithdrawSuggestionContent {...props} />
     </Box>
   );
 };

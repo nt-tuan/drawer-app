@@ -12,10 +12,10 @@ if (numeral.locales["vi"] === undefined) {
       decimal: ",",
     },
     abbreviations: {
-      thousand: " nghìn",
-      million: " triệu",
-      billion: " tỷ",
-      trillion: " nghìn tỷ",
+      thousand: " k",
+      million: " m",
+      billion: " b",
+      trillion: " t",
     },
     ordinal: function () {
       return ".";

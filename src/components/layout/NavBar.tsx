@@ -60,14 +60,20 @@ export const NavBar = () => {
         <MenuItem href="/drawer">Reset Drawer</MenuItem>
       </Grid>
       <Menu closeOnSelect={false}>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+        <MenuButton
+          as={Button}
+          mx={4}
+          variant="link"
+          color="gray.700"
+          rightIcon={<ChevronDownIcon />}
+        >
           <SettingsIcon />
         </MenuButton>
-        <MenuList>
+        <MenuList bgColor="white">
           <CKMenuItem>
             <FormControl display="flex" alignItems="center">
               <FormLabel htmlFor="cash-view-type" mb="0">
-                Hiển thị tiền đầy đủ
+                Hiển thị tiền thu gọn
               </FormLabel>
               <Switch
                 id="cash-view-type"

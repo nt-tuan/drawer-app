@@ -139,7 +139,7 @@ const DrawerTransactionView = ({
         my={1}
         overflow="hidden"
       >
-        <Box flex={1}>
+        <Box w={0} flexGrow={{ base: 1, md: 2 }}>
           <Flex
             direction="column"
             h="100%"
@@ -178,7 +178,7 @@ const DrawerTransactionView = ({
             </VStack>
           </Flex>
         </Box>
-        <Box px={1} pl={2} w={72}>
+        <Box w={0} flexGrow={1} px={1} pl={2}>
           <Flex
             h="100%"
             direction="column"
@@ -202,7 +202,7 @@ const DrawerTransactionView = ({
         </Box>
       </Flex>
       <Flex alignItems="baseline" justify="stretch">
-        <Box w={0} flex={1} textColor="gray.500">
+        <Box textColor="gray.500">
           <span>Thực tế/tổng tiền</span>
         </Box>
         <Box

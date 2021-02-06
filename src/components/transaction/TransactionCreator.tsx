@@ -5,10 +5,63 @@ import { useOrderGenerator } from "components/order/useOrderGenerator";
 import { OrderMultipleSelect } from "components/order/OrderMultipleSelect";
 import { TransactionContext } from "components/transaction/TransactionContext";
 import { DrawerReset } from "components/drawer/DrawerSetter";
-import { Box, Button, Center, Flex, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  useToast,
+} from "@chakra-ui/react";
 import { TransactionProvider } from "./TransactionProvider";
 import { getTotalBalance } from "resources/transaction/transaction";
 import { useRouter } from "next/dist/client/router";
+import { HamburgerIcon } from "@chakra-ui/icons";
+interface DrawerProps {
+  orders: Order[];
+  selectedOrders: Order[];
+  onOrderSelect: (order: Order) => void;
+}
+const SelectOrderDrawer = (props: DrawerProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+  return (
+    <>
+      <Button
+        ml={6}
+        colorScheme="teal"
+        leftIcon={<HamburgerIcon />}
+        onClick={handleOpen}
+      >
+        Chọn đơn hàng ({props.selectedOrders.length}/{props.orders.length})
+      </Button>
+      <Drawer isOpen={isOpen} placement="left" onClose={handleClose}>
+        <DrawerOverlay>
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader>
+              Đơn hàng{" "}
+              {props.orders.length > 0 ? `(${props.orders.length})` : ""}
+            </DrawerHeader>
+            <DrawerBody>
+              <OrderMultipleSelect
+                orders={props.orders}
+                selected={props.selectedOrders}
+                onClick={props.onOrderSelect}
+              />
+            </DrawerBody>
+          </DrawerContent>
+        </DrawerOverlay>
+      </Drawer>
+    </>
+  );
+};
 
 const TransactionContextConsumer = () => {
   useOrderGenerator({
@@ -80,33 +133,43 @@ const TransactionContextConsumer = () => {
   }, [drawer, toast, router]);
 
   return (
-    <Flex h="100%" overflow="hidden">
-      <Box w={80} h="100%">
-        <Box
-          textAlign="center"
-          fontSize="2xl"
-          fontWeight="bold"
-          textColor="blue.700"
-          mb={2}
-        >
-          Đơn hàng {orders.length > 0 ? `(${orders.length})` : ""}
-        </Box>
-        <OrderMultipleSelect
+    <Flex h="100%" direction="column">
+      <Box display={{ base: "block", md: "none" }}>
+        <SelectOrderDrawer
           orders={orders}
-          selected={selectedOrders}
-          onClick={handleSelectOrder}
+          selectedOrders={selectedOrders}
+          onOrderSelect={handleSelectOrder}
         />
       </Box>
-      <Box w={0} h="100%" flex={1} pl={4}>
-        {drawer == null && <DrawerReset />}
-        {drawer != null && selectedOrders.length !== 0 ? (
-          <DrawerTransaction orders={selectedOrders} />
-        ) : (
-          <Center h="100%" fontWeight="bold">
-            Vui lòng chọn đơn hàng để thực hiện thanh toán
-          </Center>
-        )}
-      </Box>
+      <Flex flex={1} overflow="hidden">
+        <Box display={{ base: "none", md: "block" }} w={80} h="100%">
+          <Box
+            textAlign="center"
+            fontSize="2xl"
+            fontWeight="bold"
+            textColor="blue.700"
+            mb={2}
+          >
+            Đơn hàng {orders.length > 0 ? `(${orders.length})` : ""}
+          </Box>
+          <OrderMultipleSelect
+            orders={orders}
+            selected={selectedOrders}
+            onClick={handleSelectOrder}
+          />
+        </Box>
+        <Box w={0} h="100%" flex={1} pl={4}>
+          {drawer == null && <DrawerReset />}
+          {drawer != null && selectedOrders.length !== 0 ? (
+            <DrawerTransaction orders={selectedOrders} />
+          ) : (
+            <Box ml={2} h="100%" fontWeight="bold">
+              Vui lòng chọn đơn hàng để thực hiện thanh toán. Bạn chưa chọn đơn
+              hàng để tạo giao dịch.
+            </Box>
+          )}
+        </Box>
+      </Flex>
     </Flex>
   );
 };

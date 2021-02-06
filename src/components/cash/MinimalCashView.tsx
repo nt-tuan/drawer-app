@@ -13,7 +13,7 @@ export const MinimalCashView = ({
   const color100 = (colorScheme ?? "gray") + ".100";
   if (count === 0) return <></>;
   return (
-    <WrapItem>
+    <WrapItem key={cash}>
       <Flex
         border="2px"
         rounded="base"

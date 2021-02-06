@@ -1,5 +1,5 @@
 import React from "react";
-import { OrderItem } from "resources/order";
+import { Order, OrderItem } from "resources/order";
 import { loadProducts, Product } from "resources/product";
 import { v4 } from "uuid";
 import { TransactionContext } from "components/transaction/TransactionContext";
@@ -18,7 +18,7 @@ const randomOrder = (
   orderItemCountRange: [number, number],
   quantityPerProduct: [number, number],
   products: Product[]
-) => {
+): Order => {
   const orderItemCount = randomInt(
     orderItemCountRange[0],
     orderItemCountRange[1]
@@ -46,7 +46,6 @@ const randomOrder = (
     localId: v4(),
     id: 0,
     total,
-    address: {},
     discount: 0,
     status: "draft",
     shipping_fee: 0,

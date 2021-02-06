@@ -1,7 +1,7 @@
 import { NowRequest, NowResponse } from "@vercel/node";
 
 export default async (request: NowRequest, response: NowResponse) => {
-  const r = await fetch(process.env.NEXT_PUBLIC_PRODUCTS_URL, {
+  const r = await fetch(process.env.NEXT_PUBLIC_PRODUCTS_URL as string, {
     method: "GET",
     headers: {
       "Content-Type": "application/json charset=utf-8",
